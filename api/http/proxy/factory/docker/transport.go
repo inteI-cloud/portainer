@@ -1,9 +1,11 @@
 package docker
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -11,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
@@ -163,6 +165,21 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 
 		// volume browser request
 		return transport.restrictedResourceOperation(r, resourceID, portainer.VolumeResourceControl, true)
+	case strings.HasPrefix(requestPath, "/dockerhub"):
+		dockerhub, err := transport.dataStore.DockerHub().DockerHub()
+		if err != nil {
+			return nil, err
+		}
+
+		newBody, err := json.Marshal(dockerhub)
+		if err != nil {
+			return nil, err
+		}
+
+		r.Method = http.MethodPost
+
+		r.Body = ioutil.NopCloser(bytes.NewReader(newBody))
+		r.ContentLength = int64(len(newBody))
 	}
 
 	return transport.executeDockerRequest(r)
