@@ -53,6 +53,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'clipboard',
   'WebhookHelper',
   'NetworkService',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -85,8 +86,11 @@ angular.module('portainer.docker').controller('ServiceController', [
     EndpointProvider,
     clipboard,
     WebhookHelper,
-    NetworkService
+    NetworkService,
+    endpoint
   ) {
+    $scope.endpoint = endpoint;
+
     $scope.state = {
       updateInProgress: false,
       deletionInProgress: false,
@@ -526,6 +530,11 @@ angular.module('portainer.docker').controller('ServiceController', [
         },
       });
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.updateService = function updateService(service) {
       let config = {};
