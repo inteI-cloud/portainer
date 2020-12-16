@@ -33,6 +33,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
   'SettingsService',
   'WebhookService',
   'EndpointProvider',
+  'endpoint',
   function (
     $q,
     $scope,
@@ -58,8 +59,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     NodeService,
     SettingsService,
     WebhookService,
-    EndpointProvider
+    EndpointProvider,
+    endpoint
   ) {
+    $scope.endpoint = endpoint;
+
     $scope.formValues = {
       Name: '',
       RegistryModel: new PorImageRegistryModel(),
@@ -104,6 +108,7 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     $scope.state = {
       formValidationError: '',
       actionInProgress: false,
+      pullImageValidity: false,
     };
 
     $scope.allowBindMounts = false;
@@ -113,6 +118,11 @@ angular.module('portainer.docker').controller('CreateServiceController', [
         $scope.$broadcast('rzSliderForceRender');
       });
     };
+
+    $scope.setPullImageValidity = setPullImageValidity;
+    function setPullImageValidity(validity) {
+      $scope.state.pullImageValidity = validity;
+    }
 
     $scope.addPortBinding = function () {
       $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
