@@ -40,6 +40,7 @@ class KubernetesCreateApplicationController {
     Notifications,
     EndpointProvider,
     Authentication,
+    DockerHubService,
     ModalService,
     KubernetesResourcePoolService,
     KubernetesApplicationService,
@@ -56,6 +57,7 @@ class KubernetesCreateApplicationController {
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.Authentication = Authentication;
+    this.DockerHubService = DockerHubService;
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -84,8 +86,13 @@ class KubernetesCreateApplicationController {
     this.refreshApplicationsAsync = this.refreshApplicationsAsync.bind(this);
     this.refreshNamespaceDataAsync = this.refreshNamespaceDataAsync.bind(this);
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
+    this.setPullImageValidity = this.setPullImageValidity.bind(this);
   }
   /* #endregion */
+
+  setPullImageValidity(validity) {
+    this.state.pullImageValidity = validity;
+  }
 
   onChangeName() {
     const existingApplication = _.find(this.applications, { Name: this.formValues.Name });
@@ -847,6 +854,8 @@ class KubernetesCreateApplicationController {
           name: this.$transition$.params().name,
         },
         PersistedFoldersUseExistingVolumes: false,
+        pullImageValidity: false,
+        isDockerAuthenticated: false,
       };
 
       this.isAdmin = this.Authentication.isAdmin();
@@ -922,6 +931,9 @@ class KubernetesCreateApplicationController {
         this.formValues.AutoScaler = KubernetesApplicationHelper.generateAutoScalerFormValueFromHorizontalPodAutoScaler(null, this.formValues.ReplicaCount);
         this.formValues.OriginalIngressClasses = angular.copy(this.ingresses);
       }
+
+      const dockerHub = await this.DockerHubService.dockerhub();
+      this.state.isDockerAuthenticated = dockerHub.Authentication;
 
       await this.updateSliders();
     } catch (err) {
