@@ -10,11 +10,19 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
-// POST request on /api/stacks/:id/start
+// @summary Starts a stopped Stack
+// @tags Stacks
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "Stack Id"
+// @success 200 {object} portainer.Stack
+// @failure 400,403,404,500
+// @router /stacks/{id}/start [post]
 func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
