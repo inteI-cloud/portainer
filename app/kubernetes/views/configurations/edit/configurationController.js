@@ -10,6 +10,7 @@ class KubernetesConfigurationController {
   constructor(
     $async,
     $state,
+    $window,
     clipboard,
     Notifications,
     LocalStorage,
@@ -22,6 +23,7 @@ class KubernetesConfigurationController {
   ) {
     this.$async = $async;
     this.$state = $state;
+    this.$window = $window;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
@@ -188,6 +190,21 @@ class KubernetesConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  async uiCanExit() {
+    if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+      return this.ModalService.confirmAsync({
+        title: 'Are you sure ?',
+        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+      });
+    }
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -201,6 +218,7 @@ class KubernetesConfigurationController {
         activeTab: 0,
         currentName: this.$state.$current.name,
         isDataValid: true,
+        isEditorDirty: false,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
@@ -220,6 +238,7 @@ class KubernetesConfigurationController {
           value = atob(value);
         }
         this.formValues.DataYaml += key + ': ' + value + '\n';
+        this.oldDataYaml = this.formValues.DataYaml;
         const entry = new KubernetesConfigurationFormValuesDataEntry();
         entry.Key = key;
         entry.Value = value;
@@ -231,6 +250,12 @@ class KubernetesConfigurationController {
     } finally {
       this.state.viewReady = true;
     }
+
+    this.$window.onbeforeunload = () => {
+      if (!this.formValues.IsSimple && this.formValues.DataYaml !== this.oldDataYaml && this.state.isEditorDirty) {
+        return '';
+      }
+    };
   }
 
   $onInit() {

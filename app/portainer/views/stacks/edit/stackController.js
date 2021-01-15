@@ -3,6 +3,7 @@ angular.module('portainer.app').controller('StackController', [
   '$q',
   '$scope',
   '$state',
+  '$window',
   '$transition$',
   'StackService',
   'NodeService',
@@ -22,6 +23,7 @@ angular.module('portainer.app').controller('StackController', [
     $q,
     $scope,
     $state,
+    $window,
     $transition$,
     StackService,
     NodeService,
@@ -42,11 +44,18 @@ angular.module('portainer.app').controller('StackController', [
       migrationInProgress: false,
       externalStack: false,
       showEditorTab: false,
+      isEditorDirty: false,
     };
 
     $scope.formValues = {
       Prune: false,
       Endpoint: null,
+    };
+
+    $window.onbeforeunload = () => {
+      if ($scope.stackFileContent && $scope.state.isEditorDirty) {
+        return '';
+      }
     };
 
     $scope.duplicateStack = function duplicateStack(name, endpointId) {
@@ -167,6 +176,7 @@ angular.module('portainer.app').controller('StackController', [
       StackService.updateStack(stack, stackFile, env, prune)
         .then(function success() {
           Notifications.success('Stack successfully deployed');
+          $scope.state.isEditorDirty = false;
           $state.reload();
         })
         .catch(function error(err) {
@@ -187,6 +197,7 @@ angular.module('portainer.app').controller('StackController', [
 
     $scope.editorUpdate = function (cm) {
       $scope.stackFileContent = cm.getValue();
+      $scope.state.isEditorDirty = true;
     };
 
     $scope.stopStack = stopStack;
@@ -358,6 +369,21 @@ angular.module('portainer.app').controller('StackController', [
           Notifications.error('Failure', err, 'Unable to retrieve stack details');
         });
     }
+
+    this.uiCanExit = async function () {
+      if ($scope.stackFileContent && $scope.state.isEditorDirty) {
+        return ModalService.confirmAsync({
+          title: 'Are you sure ?',
+          message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+          buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-danger',
+            },
+          },
+        });
+      }
+    };
 
     function initView() {
       var stackName = $transition$.params().name;

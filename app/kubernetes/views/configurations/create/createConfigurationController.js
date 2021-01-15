@@ -5,9 +5,11 @@ import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/mo
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
+  constructor($async, $state, $window, ModalService, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
+    this.$window = $window;
+    this.ModalService = ModalService;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
@@ -43,6 +45,7 @@ class KubernetesCreateConfigurationController {
       this.formValues.ConfigurationOwner = this.Authentication.getUserDetails().username;
       await this.KubernetesConfigurationService.create(this.formValues);
       this.Notifications.success('Configuration succesfully created');
+      this.state.isEditorDirty = false;
       this.$state.go('kubernetes.configurations');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create configuration');
@@ -67,12 +70,28 @@ class KubernetesCreateConfigurationController {
     return this.$async(this.getConfigurationsAsync);
   }
 
+  async uiCanExit() {
+    if (!this.formValues.IsSimple && this.formValues.DataYaml && this.state.isEditorDirty) {
+      return this.ModalService.confirmAsync({
+        title: 'Are you sure ?',
+        message: 'You currently have unsaved changes in the editor. Are you sure you want to leave?',
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-danger',
+          },
+        },
+      });
+    }
+  }
+
   async onInit() {
     this.state = {
       actionInProgress: false,
       viewReady: false,
       alreadyExist: false,
       isDataValid: true,
+      isEditorDirty: false,
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
@@ -89,6 +108,12 @@ class KubernetesCreateConfigurationController {
     } finally {
       this.state.viewReady = true;
     }
+
+    this.$window.onbeforeunload = () => {
+      if (!this.formValues.IsSimple && this.formValues.DataYaml && this.state.isEditorDirty) {
+        return '';
+      }
+    };
   }
 
   $onInit() {
