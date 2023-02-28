@@ -981,17 +981,17 @@
   dependencies:
     "@types/node" "*"
 
-"@uirouter/angularjs@1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.11.tgz#ced1ec8bea68a5db7dcfd77a43b7b8b9a2953540"
-  integrity sha512-AG6DT1mYEGLyRt8/Ggf/1teh4pp0yB99GTufC/pY6FfxmkrVE44dv9bGTOrcEETiPgu1SezsqTMjbXEv55JxCw==
+"@uirouter/angularjs@1.0.30":
+  version "1.0.30"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.30.tgz#5cea4076300ce5ec6926e2c6e3707745753baefc"
+  integrity sha512-qkc3RFZc91S5K0gc/QVAXc9LGDPXjR04vDgG/11j8+yyZEuQojXxKxdLhKIepiPzqLmGRVqzBmBc27gtqaEeZg==
   dependencies:
-    "@uirouter/core" "5.0.11"
+    "@uirouter/core" "6.0.8"
 
-"@uirouter/core@5.0.11":
-  version "5.0.11"
-  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-5.0.11.tgz#bec461fcda767d79c98f6647cc9313ef9e5de03a"
-  integrity sha512-x8js8f0nJivRMlxVyFcP5VmHyI091qUYCSEP69+m3uTCsIlCvLWmQiT4/FY7YBe9go6tYBBzPV+dWseg5XMD8Q==
+"@uirouter/core@6.0.8":
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.8.tgz#a1e919a4743be729751aafc4ce353d0dc0ffd26c"
+  integrity sha512-Gc/BAW47i4L54p8dqYCJJZuv2s3tqlXQ0fvl6Zp2xrblELPVfxmjnc0eurx3XwfQdaqm3T6uls6tQKkof/4QMw==
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
@@ -1352,7 +1352,6 @@ angular-moment-picker@^0.10.2:
   dependencies:
     angular-mocks "1.6.1"
     angular-sanitize "1.6.1"
-    lodash-es "^4.17.15"
 
 angular-resource@1.8.0:
   version "1.8.0"
