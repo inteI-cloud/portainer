@@ -90,7 +90,7 @@
     "ui-select": "^0.19.8",
     "uuid": "^3.3.2",
     "xterm": "^3.8.0",
-    "yaml": "^1.10.0"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
